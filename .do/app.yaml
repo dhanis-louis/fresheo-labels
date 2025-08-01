@@ -1,0 +1,38 @@
+name: fresheo-labels-api
+services:
+  - name: web
+  source_dir: /
+  dockerfile_path: Dockerfile
+    build_command: ""
+    run_command: "gunicorn --bind 0.0.0.0:5001 --timeout 600 --workers 1 --worker-class sync --max-requests 50 app:app"
+    environment_slug: python
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 5001
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 60
+      timeout_seconds: 30
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: FRESHEO_BASE_URL
+        value: "https://api.fresheo.be"
+        type: SECRET
+      - key: FRESHEO_API_TOKEN
+        value: "your_token_here"
+        type: SECRET
+      - key: PORT
+        value: "5001"
+      - key: DEBUG
+        value: "False"
+    routes:
+      - path: /
+    alerts:
+      - rule: CPU_UTILIZATION
+        value: 80
+      - rule: MEM_UTILIZATION
+        value: 80
+      - rule: RESTART_COUNT
+        value: 5

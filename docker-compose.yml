@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: fresheo-labels-app
+    restart: unless-stopped
+    environment:
+      - FRESHEO_API_TOKEN=${FRESHEO_API_TOKEN}
+      - FRESHEO_BASE_URL=${FRESHEO_BASE_URL:-https://api.fresheo.be}
+      - PORT=5001
+      - DEBUG=False
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - fresheo-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import requests; requests.get('http://localhost:5001/health', timeout=10)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  nginx:
+    image: nginx:alpine
+    container_name: fresheo-labels-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - fresheo-network
+
+networks:
+  fresheo-network:
+    driver: bridge
+
+volumes:
+  logs:
