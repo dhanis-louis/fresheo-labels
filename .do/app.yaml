@@ -1,38 +1,42 @@
 name: fresheo-labels-api
 services:
-  - name: web
+- name: web
   source_dir: /
+  github:
+    repo: dhanis-louis/fresheo-labels
+    branch: main
+    deploy_on_push: true
   dockerfile_path: Dockerfile
-    build_command: ""
-    run_command: "gunicorn --bind 0.0.0.0:5001 --timeout 600 --workers 1 --worker-class sync --max-requests 50 app:app"
-    environment_slug: python
-    instance_count: 1
-    instance_size_slug: basic-xxs
-    http_port: 5001
-    health_check:
-      http_path: /health
-      initial_delay_seconds: 30
-      period_seconds: 60
-      timeout_seconds: 30
-      success_threshold: 1
-      failure_threshold: 3
-    envs:
-      - key: FRESHEO_BASE_URL
-        value: "https://api.fresheo.be"
-        type: SECRET
-      - key: FRESHEO_API_TOKEN
-        value: "your_token_here"
-        type: SECRET
-      - key: PORT
-        value: "5001"
-      - key: DEBUG
-        value: "False"
-    routes:
-      - path: /
-    alerts:
-      - rule: CPU_UTILIZATION
-        value: 80
-      - rule: MEM_UTILIZATION
-        value: 80
-      - rule: RESTART_COUNT
-        value: 5
+  build_command: ""
+  run_command: "gunicorn --bind 0.0.0.0:5001 --timeout 600 --workers 1 --worker-class sync --max-requests 50 app:app"
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 5001
+  health_check:
+    http_path: /health
+    initial_delay_seconds: 30
+    period_seconds: 60
+    timeout_seconds: 30
+    success_threshold: 1
+    failure_threshold: 3
+  envs:
+  - key: FRESHEO_BASE_URL
+    value: "https://api.fresheo.be"
+    type: SECRET
+  - key: FRESHEO_API_TOKEN
+    value: "8J6ZWj73UITX6KOmfxLhn4HC5q71dd167K1WONWWT9qK1AvpN5V9JPND3w4rd8A0xv7u0q1vhM2QWr7ZuUHRWjTUKdx6Sm2o2sz8jM2GBIoSQ8nea91fV4DfOxXZpIYN"
+    type: SECRET
+  - key: PORT
+    value: "5001"
+  - key: DEBUG
+    value: "False"
+  routes:
+  - path: /
+  alerts:
+  - rule: CPU_UTILIZATION
+    value: 80
+  - rule: MEM_UTILIZATION
+    value: 80
+  - rule: RESTART_COUNT
+    value: 5
