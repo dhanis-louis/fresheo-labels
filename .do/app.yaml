@@ -9,7 +9,6 @@ services:
   dockerfile_path: Dockerfile
   build_command: ""
   run_command: "gunicorn --bind 0.0.0.0:5001 --timeout 600 --workers 1 --worker-class sync --max-requests 50 app:app"
-  environment_slug: python
   instance_count: 1
   instance_size_slug: basic-xxs
   http_port: 5001
