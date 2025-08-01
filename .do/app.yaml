@@ -7,7 +7,6 @@ services:
     branch: main
     deploy_on_push: true
   dockerfile_path: Dockerfile
-  build_command: ""
   run_command: "gunicorn --bind 0.0.0.0:5001 --timeout 600 --workers 1 --worker-class sync --max-requests 50 app:app"
   instance_count: 1
   instance_size_slug: basic-xxs
@@ -32,10 +31,3 @@ services:
     value: "False"
   routes:
   - path: /
-  alerts:
-  - rule: CPU_UTILIZATION
-    value: 80
-  - rule: MEM_UTILIZATION
-    value: 80
-  - rule: RESTART_COUNT
-    value: 5
