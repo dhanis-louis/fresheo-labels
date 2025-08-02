@@ -153,34 +153,13 @@ def extract_orders_for_csv(date: str, api: FresheoDeliveryAPI) -> List[Dict[str,
     
     # 1. Récupérer toutes les tournées du jour
     rounds = api.get_delivery_rounds_for_date(date)
-    app.logger.info(f"Récupération tournées pour {date}: type={type(rounds)}, count={len(rounds) if isinstance(rounds, list) else 'NOT_LIST'}")
-    
-    # Vérification de sécurité: rounds doit être une liste
-    if not isinstance(rounds, list):
-        app.logger.error(f"get_delivery_rounds_for_date a retourné un {type(rounds)} au lieu d'une liste: {rounds}")
-        return []
     
     # 2. Pour chaque tournée, récupérer les détails
     for round_data in rounds:
-        # Vérification de sécurité: round_data doit être un dict
-        if not isinstance(round_data, dict) or 'id' not in round_data:
-            app.logger.error(f"round_data invalide: {type(round_data)} = {round_data}")
-            continue
-            
         round_details = api.get_round_details(round_data['id'])
-        app.logger.info(f"Tournée {round_data['id']}: type={type(round_details)}, keys={list(round_details.keys()) if isinstance(round_details, dict) else 'NOT_DICT'}")
         
         # 3. Extraire les commandes de cette tournée
-        if not isinstance(round_details, dict):
-            app.logger.error(f"round_details n'est pas un dict: {type(round_details)} = {round_details}")
-            continue
-            
-        orders = round_details.get('orders', [])
-        if not isinstance(orders, list):
-            app.logger.error(f"orders n'est pas une liste: {type(orders)} = {orders}")
-            continue
-            
-        for order in orders:
+        for order in round_details.get('orders', []):
             # Récupérer les détails complets de la commande pour total_meals
             order_details = api.get_order_details(order['id'])
             total_meals = order_details.get('total_meals', 4)  # Valeur par défaut si non trouvé
@@ -282,11 +261,8 @@ def delivery_csv():
                 orders_for_date = extract_orders_for_csv(date, api)
                 all_orders_for_csv.extend(orders_for_date)
             except Exception as e:
-                import traceback
-                app.logger.error(f"Erreur pour la date {date}: {e}")
-                app.logger.error(f"Traceback complet: {traceback.format_exc()}")
-                # Retourner l'erreur pour débugger au lieu de continuer silencieusement
-                raise
+                app.logger.warning(f"Erreur pour la date {date}: {e}")
+                continue
         
         app.logger.info(f"Génération du CSV pour {len(all_orders_for_csv)} commandes")
         
